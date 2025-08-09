@@ -21,7 +21,7 @@ API.interceptors.response.use(
     if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const res = await API.post('/auth/refresh');
+        const res = await API.post('/auth/refresh', {}, { withCredentials: true });
         const newToken = res.data?.token;
         const user = res.data?.user;
         if (newToken) {

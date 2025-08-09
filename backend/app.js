@@ -17,8 +17,15 @@ const app = express();
 
 app.use(helmet());
 app.use(hpp());
-const allowedOrigins = (process.env.FRONTEND_ORIGIN ? process.env.FRONTEND_ORIGIN.split(',') : ['http://localhost:5173']);
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+const allowedOrigins = (process.env.FRONTEND_ORIGIN ? process.env.FRONTEND_ORIGIN.split(',').map(s=>s.trim()) : ['http://localhost:5173']);
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const isAllowed = allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin);
+    return callback(isAllowed ? null : new Error('Not allowed by CORS'), isAllowed);
+  },
+  credentials: true
+}));
 app.use(bodyParser());
 app.use(cookieParser());
 
