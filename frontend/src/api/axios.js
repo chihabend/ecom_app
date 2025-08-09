@@ -1,7 +1,17 @@
 import axios from 'axios';
 
+// Normalize baseURL to avoid Mixed Content and missing /api in prod
+const rawBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').trim();
+let normalizedBase = rawBase;
+if (normalizedBase.startsWith('http://')) {
+  normalizedBase = 'https://' + normalizedBase.slice(7);
+}
+if (normalizedBase.startsWith('https://') && !/\/api(\/|$)/.test(normalizedBase)) {
+  normalizedBase = normalizedBase.replace(/\/$/, '') + '/api';
+}
+
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: normalizedBase,
   withCredentials: true
 });
 
