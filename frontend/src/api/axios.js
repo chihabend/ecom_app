@@ -3,6 +3,14 @@ import axios from 'axios';
 // Normalize baseURL to avoid Mixed Content and missing /api in prod
 const rawBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').trim();
 let normalizedBase = rawBase;
+
+// On Vercel domains, force proxy via /api to avoid Mixed Content regardless of env
+if (typeof window !== 'undefined') {
+  const host = window.location.hostname;
+  if (window.location.protocol === 'https:' && /vercel\.app$/.test(host)) {
+    normalizedBase = '/api';
+  }
+}
 if (normalizedBase.startsWith('http://')) {
   normalizedBase = 'https://' + normalizedBase.slice(7);
 }
